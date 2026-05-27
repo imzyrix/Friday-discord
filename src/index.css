@@ -6,30 +6,110 @@
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
 
-/* Custom Cybernetic CRT Scan animations and Grid Backdrops background styling */
-.absolute.inset-0.bg-radial-grid {
-  background-image: 
-    radial-gradient(circle at 50% 50%, rgba(6, 182, 212, 0.05) 0%, transparent 80%),
-    linear-gradient(rgba(18, 18, 18, 0.4) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(18, 18, 18, 0.4) 1px, transparent 1px);
-  background-size: 100% 100%, 30px 30px, 30px 30px;
+/* Custom Tactical Background and HUD Grid Backdrops styling */
+body {
+  background-color: #080a0f;
+  color: #c9d1d9;
+  font-family: var(--font-sans);
+  overflow-x: hidden;
 }
 
-/* CRT holographic scanning bar animation scale script */
-@keyframes scanline {
+.hud-grid-bg {
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(0, 245, 255, 0.05) 0%, transparent 80%),
+    radial-gradient(rgba(0, 245, 255, 0.08) 1.5px, transparent 1.5px);
+  background-size: 100% 100%, 24px 24px;
+}
+
+/* Dynamic glow metrics scan sweep */
+@keyframes scanline-sweep {
   0% {
-    transform: translateY(-100%);
+    top: -5%;
   }
   100% {
-    transform: translateY(100vh);
+    top: 105%;
   }
 }
 
-.animate-scan {
-  animation: scanline 8s linear infinite;
+.hud-scanline {
+  position: fixed;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    rgba(0, 245, 255, 0) 0%, 
+    rgba(0, 245, 255, 0.25) 50%, 
+    rgba(0, 245, 255, 0) 100%
+  );
+  box-shadow: 0 0 12px rgba(0, 245, 255, 0.5);
+  pointer-events: none;
+  z-index: 9999;
+  animation: scanline-sweep 6s linear infinite;
 }
 
-/* Shiny gradient sweep animation */
+/* The God-Tier HUD panel styling containing corner brackets */
+.hud-panel {
+  position: relative;
+  border: 1px solid rgba(0, 245, 255, 0.15);
+  box-shadow: 0 0 20px rgba(0, 245, 255, 0.05) inset;
+  background: rgba(10, 14, 23, 0.75);
+  backdrop-filter: blur(8px);
+}
+
+.hud-panel::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  width: 10px;
+  height: 10px;
+  border-top: 2px solid #00f5ff;
+  border-left: 2px solid #00f5ff;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.hud-panel::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  right: -1px;
+  width: 10px;
+  height: 10px;
+  border-bottom: 2px solid #00f5ff;
+  border-right: 2px solid #00f5ff;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Additional secondary diagonal brackets to make them super tactical */
+.hud-panel-quad::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  width: 10px;
+  height: 10px;
+  border-top: 2px solid #00f5ff;
+  border-right: 2px solid #00f5ff;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.hud-panel-quad::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: -1px;
+  width: 10px;
+  height: 10px;
+  border-bottom: 2px solid #00f5ff;
+  border-left: 2px solid #00f5ff;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Shiny text sweep animation */
 @keyframes shine {
   0% {
     background-position: 200% 0;
@@ -43,54 +123,71 @@
   animation: shine 5s linear infinite;
 }
 
-/* Terminal Log custom scrollbar styling script */
+/* Tactical scrollbar interfaces */
 .custom-terminal-scroll::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 
 .custom-terminal-scroll::-webkit-scrollbar-track {
-  background: rgba(9, 9, 11, 0.6);
-  border-left: 1px solid rgba(6, 182, 212, 0.05);
+  background: rgba(8, 10, 15, 0.85);
+  border-left: 1px solid rgba(0, 245, 255, 0.05);
 }
 
 .custom-terminal-scroll::-webkit-scrollbar-thumb {
-  background: rgba(6, 182, 212, 0.2);
+  background: rgba(0, 245, 255, 0.2);
   border-radius: 99px;
-  border: 1px solid rgba(6, 182, 212, 0.1);
+  border: 1px solid rgba(0, 245, 255, 0.1);
 }
 
 .custom-terminal-scroll::-webkit-scrollbar-thumb:hover {
-  background: rgba(6, 182, 212, 0.45);
+  background: rgba(0, 245, 255, 0.45);
 }
 
-/* Cybernetic transition animations specs */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
+/* Custom blinking light alerts */
+@keyframes tactical-blink {
+  0%, 100% {
     opacity: 1;
-    transform: translateY(0);
+    transform: scale(1);
+    box-shadow: 0 0 8px rgba(0, 245, 255, 0.8);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(0.9);
+    box-shadow: 0 0 2px rgba(0, 245, 255, 0.2);
   }
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+.animate-hud-blink {
+  animation: tactical-blink 2s ease-in-out infinite;
 }
 
-/* Override default focus rings for pristine dark display metrics */
-input:focus, select:focus {
-  box-shadow: 0 0 10px rgba(6, 182, 212, 0.25);
-  border-color: rgba(6, 182, 212, 0.5) !important;
+@keyframes tactical-blink-red {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.8);
+  }
+  50% {
+    opacity: 0.3;
+    transform: scale(0.9);
+    box-shadow: 0 0 2px rgba(239, 68, 68, 0.2);
+  }
 }
 
-/* Text glow specs colors */
+.animate-hud-blink-red {
+  animation: tactical-blink-red 1.5s ease-in-out infinite;
+}
+
+/* Glow styles */
 .text-glow-cyan {
-  text-shadow: 0 0 8px rgba(6, 182, 212, 0.5);
+  text-shadow: 0 0 8px rgba(0, 245, 255, 0.5);
 }
 
 .text-glow-orange {
   text-shadow: 0 0 8px rgba(249, 115, 22, 0.5);
+}
+
+.text-glow-red {
+  text-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
 }

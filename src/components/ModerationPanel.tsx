@@ -1,7 +1,19 @@
 import React, { useState } from 'react';
-import { Shield, ShieldAlert, ShieldX, VolumeX, Volume2, UserX, Trash2, Search, UserMinus } from 'lucide-react';
+import { 
+  ShieldAlert, 
+  ShieldX, 
+  VolumeX, 
+  Volume2, 
+  UserMinus, 
+  Search, 
+  Radio, 
+  Clock, 
+  HelpCircle,
+  Check,
+  X
+} from 'lucide-react';
+import { motion } from 'motion/react';
 import { Member, Role } from '../types';
-
 import ShinyText from './animations/ShinyText';
 import LetterGlitch from './animations/LetterGlitch';
 
@@ -12,16 +24,27 @@ interface ModerationPanelProps {
   onRemoveMember: (id: string, type: 'kick' | 'ban') => Promise<any>;
 }
 
-export default function ModerationPanel({ members, roles, onUpdateMember, onRemoveMember }: ModerationPanelProps) {
+export default function ModerationPanel({ members = [], roles = [], onUpdateMember, onRemoveMember }: ModerationPanelProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedRoleFilter, setSelectedRoleFilter] = useState('');
+  // State for administrative confirmation popovers
+  const [confirmAction, setConfirmAction] = useState<{ memberId: string; type: 'kick' | 'ban' } | null>(null);
 
   const getStatusColor = (status: Member['status']) => {
     switch (status) {
-      case 'online': return 'bg-emerald-400 shadow-[0_0_8px_#34d399]';
-      case 'idle': return 'bg-amber-400 shadow-[0_0_8px_#fbbf24]';
-      case 'dnd': return 'bg-red-500 shadow-[0_0_8px_#f87171]';
+      case 'online': return 'bg-emerald-400 shadow-[0_0_10px_#10b981] animate-pulse';
+      case 'idle': return 'bg-amber-400 shadow-[0_0_10px_#f59e0b]';
+      case 'dnd': return 'bg-red-500 shadow-[0_0_10px_#ef4444] animate-pulse';
       default: return 'bg-zinc-600';
+    }
+  };
+
+  const getStatusText = (status: Member['status']) => {
+    switch (status) {
+      case 'online': return 'ONLINE';
+      case 'idle': return 'IDLE SENSOR';
+      case 'dnd': return 'DO NOT DISTURB';
+      default: return 'LOST TELEMETRY (OFFLINE)';
     }
   };
 
@@ -33,7 +56,6 @@ export default function ModerationPanel({ members, roles, onUpdateMember, onRemo
 
   const handleIncrementWarning = (member: Member) => {
     const nextWarnings = Math.min(3, member.warnings + 1);
-    // If warning count hits 3, automatically trigger secure server mute as warning protocol
     const updates: Partial<Member> = { warnings: nextWarnings };
     if (nextWarnings === 3) {
       updates.isMuted = true;
@@ -49,282 +71,137 @@ export default function ModerationPanel({ members, roles, onUpdateMember, onRemo
     onUpdateMember(member.id, { isMuted: !member.isMuted });
   };
 
-  return (
-    <div id="moderation-panel" className="bg-zinc-950/80 border border-cyan-500/30 p-6 rounded-2xl shadow-[0_0_20px_rgba(6,182,212,0.15)] relative overflow-hidden">
-      {/* Background raster scan overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(rgba(18,18,18,0)_50%,rgba(6,182,212,0.01)_50%)] bg-[size:100%_4px] pointer-events-none opacity-40"></div>
+  const executeExpulsion = async (memberId: string, type: 'kick' | 'ban') => {
+    try {
+      await onRemoveMember(memberId, type);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setConfirmAction(null);
+    }
+  };
 
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 z-10">
+  return (
+    <div id="moderation-panel" className="hud-panel p-6 rounded-2xl border-cyan-500/15 overflow-hidden">
+      {/* Laser grid scanline overlay */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(18,18,18,0)_50%,rgba(0,245,255,0.01)_50%)] bg-[size:100%_4px] pointer-events-none opacity-40"></div>
+
+      <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 mb-6 z-10 relative">
         <div>
-          <h2 className="text-lg font-bold text-white tracking-wide font-sans flex items-center gap-2">
-            <span className="p-1 px-2 text-xs font-mono font-bold uppercase rounded bg-red-950/50 text-red-400 border border-red-500/20">Quarantine</span>
-            <LetterGlitch text="CITIZEN MODERATION TERMINAL" speed={45} glitchTrigger="hover" className="cursor-pointer" />
+          <h2 className="text-sm font-bold text-white tracking-widest font-mono flex items-center gap-2">
+            <span className="p-1 px-2 text-[10px] font-mono font-bold uppercase rounded bg-red-950/50 text-red-400 border border-red-500/15 animate-hud-blink-red">DANGER SECTION</span>
+            <LetterGlitch text="CITIZEN CONTAINMENT CONSOLE" speed={45} glitchTrigger="hover" className="cursor-pointer font-bold text-glow-red" />
           </h2>
-          <p className="text-xs text-zinc-400 font-mono mt-1">
-            <ShinyText text="Conduct status audits, security briefings, and apply containment countermeasures." speed={9} />
+          <p className="text-[10px] text-zinc-500 font-mono mt-1 uppercase tracking-wide">
+            <ShinyText text="Monitor active clearance operators, verify presence, and deploy sector quarantine parameters." speed={9} />
           </p>
         </div>
 
-        {/* Filters search */}
-        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto font-mono text-xs z-10">
-          <div className="relative flex-1 md:flex-initial">
+        {/* Search and filter controls */}
+        <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto font-mono text-xs">
+          <div className="relative flex-1 sm:flex-none">
             <Search className="w-3.5 h-3.5 text-zinc-500 absolute left-3 top-2.5" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search citizens..."
-              className="w-full md:w-48 bg-zinc-950 border border-cyan-500/20 pl-8 pr-3 py-2 rounded-lg text-white focus:outline-none focus:border-cyan-400/50 text-xs placeholder-zinc-600"
+              placeholder="SEARCH BY OPERATIVE..."
+              className="w-full sm:w-56 bg-zinc-950/70 border border-cyan-500/15 pl-9 pr-3 py-2 rounded-lg text-white focus:outline-none focus:border-cyan-400/50 text-xs placeholder-zinc-600 font-mono uppercase tracking-wider"
             />
           </div>
 
           <select
             value={selectedRoleFilter}
             onChange={(e) => setSelectedRoleFilter(e.target.value)}
-            className="bg-zinc-950 border border-cyan-500/20 px-3 py-2 rounded-lg text-white font-mono text-xs focus:outline-none focus:border-cyan-400/50 cursor-pointer"
+            className="bg-zinc-950 border border-cyan-500/15 px-3 py-2 rounded-lg text-white font-mono text-xs focus:outline-none focus:border-cyan-400/50 cursor-pointer uppercase tracking-wider"
           >
-            <option value="">All Clearances</option>
+            <option value="">ALL CLEARANCES</option>
             {roles.map((r) => (
-              <option key={r.id} value={r.id}>{r.name}</option>
+              <option key={r.id} value={r.id}>{r.name.toUpperCase()}</option>
             ))}
           </select>
         </div>
       </div>
 
-      {/* Members responsive view container */}
-      <div className="z-10">
-        {/* Desktop Table View */}
-        <div className="hidden md:block border border-cyan-500/10 rounded-xl overflow-hidden bg-zinc-900/20">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left font-mono text-xs">
-              <thead className="bg-zinc-900/60 text-cyan-400/80 border-b border-cyan-500/10">
-                <tr>
-                  <th className="p-4">CITIZEN IDENTITY</th>
-                  <th className="p-4">SERVER CLEARANCE</th>
-                  <th className="p-4 text-center">WARNING LEVEL</th>
-                  <th className="p-4">QUARANTINE (MUTED)</th>
-                  <th className="p-4 text-right">SYSTEM EXPULSION PROTOCOL</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-cyan-500/5">
-                {filteredMembers.map((member) => {
-                  const memberRoles = roles.filter((r) => member.roles.includes(r.id));
-                  const isUnderExtremeThreat = member.warnings >= 3;
+      {/* OPERATIVES CARD GRID DESIGN */}
+      <div className="relative z-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {filteredMembers.map((member) => {
+          const memberRoles = roles.filter((r) => member.roles.includes(r.id));
+          const isQuarantined = member.warnings >= 3 || member.isMuted;
+          const isConfirming = confirmAction?.memberId === member.id;
 
-                  return (
-                    <tr 
-                      key={member.id} 
-                      className={`hover:bg-cyan-500/[0.02] transition-colors ${
-                        isUnderExtremeThreat ? 'bg-red-950/5 hover:bg-red-950/10' : ''
-                      }`}
-                    >
-                      {/* Username & Connection Telemetry Status */}
-                      <td className="p-4">
-                        <div className="flex items-center gap-3">
-                          <div className="relative">
-                            <img 
-                              src={member.avatar} 
-                              alt={member.username} 
-                              referrerPolicy="no-referrer"
-                              className="w-9 h-9 rounded-lg border border-cyan-500/20 object-cover" 
-                            />
-                            <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border border-zinc-950 ${getStatusColor(member.status)}`} />
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-1">
-                              <span className="text-white font-semibold flex items-center gap-1">
-                                {member.username}
-                              </span>
-                              <span className="text-zinc-500 text-[10px]">#{member.discriminator}</span>
-                            </div>
-                            {member.customStatus && (
-                              <span className="text-[10px] text-zinc-500 truncate max-w-[180px] block" title={member.customStatus}>
-                                "{member.customStatus}"
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </td>
+          // Format beautiful sector join timestamp
+          const sectorJoinedDate = member.joinedAt ? new Date(member.joinedAt).toLocaleDateString() : 'VERIFY_FAIL';
 
-                      {/* Roles column */}
-                      <td className="p-4">
-                        <div className="flex flex-wrap gap-1">
-                          {memberRoles.map((r) => (
-                            <span 
-                              key={r.id} 
-                              className="px-2 py-0.5 rounded text-[9px] font-bold border"
-                              style={{ 
-                                color: r.color, 
-                                borderColor: `${r.color}33`, 
-                                backgroundColor: `${r.color}11` 
-                              }}
-                            >
-                              {r.name.split(' (')[0]}
-                            </span>
-                          ))}
-                          {memberRoles.length === 0 && (
-                            <span className="text-zinc-650 text-[10px]">No clearance</span>
-                          )}
-                        </div>
-                      </td>
+          return (
+            <motion.div
+              layout
+              key={member.id}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.35, ease: 'easeOut' }}
+              className={`relative p-5 border rounded-xl overflow-hidden backdrop-blur-md transition-all duration-300 flex flex-col justify-between ${
+                isQuarantined
+                  ? 'bg-red-950/10 border-red-500/30 shadow-[0_0_15px_rgba(248,113,113,0.1)_inset]'
+                  : 'bg-zinc-950/40 border-cyan-500/15 hover:border-cyan-400/35 hover:shadow-[0_0_15px_rgba(0,245,255,0.05)_inset]'
+              }`}
+            >
+              {/* Left indicator glowing bar */}
+              <div className={`absolute top-0 left-0 w-[4px] h-full ${
+                isQuarantined ? 'bg-red-500 shadow-[0_0_8px_rgba(239,68,68,0.7)]' : 'bg-cyan-500/30'
+              }`} />
 
-                      {/* Warning Levels Count */}
-                      <td className="p-4 text-center">
-                        <div className="flex items-center justify-center gap-1">
-                          {Array.from({ length: 3 }).map((_, i) => (
-                            <div 
-                              key={i} 
-                              className={`w-2.5 h-2.5 rounded-full border ${
-                                i < member.warnings 
-                                  ? 'bg-red-500 border-red-400 shadow-[0_0_5px_rgba(239,68,68,0.7)]' 
-                                  : 'bg-transparent border-zinc-800'
-                              }`}
-                            />
-                          ))}
-                          <span className="text-[10px] ml-2 text-zinc-500">({member.warnings}/3)</span>
-                        </div>
-                      </td>
-
-                      {/* Toggle Silence block */}
-                      <td className="p-4">
-                        <button
-                          onClick={() => handleToggleMute(member)}
-                          className={`px-2.5 py-1 rounded text-[10px] border flex items-center gap-1.5 transition-all cursor-pointer ${
-                            member.isMuted
-                              ? 'bg-red-950/40 border-red-500/50 text-red-400'
-                              : 'bg-transparent border-zinc-800 text-zinc-400 hover:border-zinc-700 hover:text-white'
-                          }`}
-                        >
-                          {member.isMuted ? (
-                            <>
-                              <VolumeX className="w-3.5 h-3.5 text-red-400" />
-                              MUTED
-                            </>
-                          ) : (
-                            <>
-                              <Volume2 className="w-3.5 h-3.5 text-zinc-400" />
-                              VOCAL
-                            </>
-                          )}
-                        </button>
-                      </td>
-
-                      {/* Expel Controls */}
-                      <td className="p-4 text-right">
-                        <div className="inline-flex gap-2">
-                          <button
-                            onClick={() => handleIncrementWarning(member)}
-                            disabled={member.warnings >= 3}
-                            className="px-2 py-1 bg-zinc-900 border border-yellow-500/20 text-yellow-500 hover:bg-yellow-950/20 disabled:border-zinc-850 disabled:text-zinc-750 disabled:bg-transparent rounded text-[10px] flex items-center gap-1 transition-colors cursor-pointer"
-                            title="Register Warning Sector"
-                          >
-                            <ShieldAlert className="w-3 h-3" />
-                            WARN
-                          </button>
-
-                          {member.warnings > 0 && (
-                            <button
-                              onClick={() => handleClearWarnings(member)}
-                              className="px-2 py-1 bg-zinc-900 border border-emerald-500/20 text-emerald-500 hover:bg-emerald-950/20 rounded text-[10px] flex items-center gap-1 transition-colors cursor-pointer"
-                            >
-                              CLEAR
-                            </button>
-                          )}
-
-                          <button
-                            onClick={() => onRemoveMember(member.id, 'kick')}
-                            disabled={member.id === 'mem-4' || member.id === 'mem-1'}
-                            className="px-2 py-1 bg-zinc-900 border border-orange-500/20 text-orange-400 hover:bg-orange-950/20 disabled:border-zinc-850 disabled:text-zinc-750 disabled:bg-transparent rounded text-[10px] flex items-center gap-1 transition-colors cursor-pointer"
-                            title="Execute Kick Protocol"
-                          >
-                            <UserMinus className="w-3.5 h-3.5" />
-                            KICK
-                          </button>
-
-                          <button
-                            onClick={() => onRemoveMember(member.id, 'ban')}
-                            disabled={member.id === 'mem-4' || member.id === 'mem-1'}
-                            className="px-2 py-1 bg-zinc-900 border border-red-500/20 hover:border-red-500/40 text-red-500 hover:bg-red-950/30 disabled:border-zinc-850 disabled:text-zinc-750 disabled:bg-transparent rounded text-[10px] flex items-center gap-1 transition-colors cursor-pointer"
-                            title="Execute Ban Action"
-                          >
-                            <ShieldX className="w-3.5 h-3.5" />
-                            BAN
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* Mobile/Tablet Card Stack List View */}
-        <div className="md:hidden space-y-4">
-          {filteredMembers.map((member) => {
-            const memberRoles = roles.filter((r) => member.roles.includes(r.id));
-            const isUnderExtremeThreat = member.warnings >= 3;
-
-            return (
-              <div 
-                key={member.id}
-                className={`p-4 border rounded-xl flex flex-col gap-4 relative overflow-hidden transition-all ${
-                  isUnderExtremeThreat 
-                    ? 'bg-red-950/10 border-red-500/30 shadow-[0_0_12px_rgba(239,68,68,0.1)]' 
-                    : 'bg-zinc-900/40 border-cyan-500/10 hover:border-cyan-500/20'
-                }`}
-              >
-                {/* Visual Accent Overlay */}
-                <div className={`absolute top-0 left-0 w-[3px] h-full ${
-                  isUnderExtremeThreat ? 'bg-red-500' : 'bg-cyan-500/40'
-                }`}></div>
-
-                {/* Identity header & Mute toggle */}
-                <div className="flex items-start justify-between gap-2 pl-2">
-                  <div className="flex items-center gap-2.5">
-                    <div className="relative">
-                      <img 
-                        src={member.avatar} 
-                        alt={member.username} 
-                        referrerPolicy="no-referrer"
-                        className="w-10 h-10 rounded-lg border border-cyan-500/20 object-cover" 
-                      />
-                      <div className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border border-zinc-950 ${getStatusColor(member.status)}`} />
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-1 font-mono text-xs">
-                        <span className="text-white font-bold">{member.username}</span>
-                        <span className="text-zinc-500 text-[9px]">#{member.discriminator}</span>
-                      </div>
-                      {member.customStatus && (
-                        <p className="text-[9.5px] text-zinc-500 font-mono mt-0.5 max-w-[160px] truncate">
-                          "{member.customStatus}"
-                        </p>
-                      )}
-                    </div>
+              {/* CARD IDENTITY HEADER */}
+              <div className="flex items-start justify-between gap-3 pb-3 border-b border-cyan-500/5">
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <img
+                      src={member.avatar}
+                      alt={member.username}
+                      referrerPolicy="no-referrer"
+                      className="w-11 h-11 rounded-lg border border-cyan-500/20 object-cover bg-zinc-900"
+                    />
+                    <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-zinc-950 ${getStatusColor(member.status)}`} />
                   </div>
 
-                  <button
-                    onClick={() => handleToggleMute(member)}
-                    className={`px-2 py-1 rounded text-[9px] font-mono border flex items-center gap-1 border-opacity-60 cursor-pointer ${
-                      member.isMuted
-                        ? 'bg-red-950/40 border-red-500/55 text-red-400 font-bold'
-                        : 'bg-transparent border-zinc-800 text-zinc-500 hover:text-zinc-300'
-                    }`}
-                  >
-                    {member.isMuted ? <VolumeX className="w-3 h-3 text-red-400" /> : <Volume2 className="w-3 h-3 text-zinc-500" />}
-                    {member.isMuted ? 'MUTED' : 'VOCAL'}
-                  </button>
+                  <div className="font-mono">
+                    <div className="flex items-center gap-1">
+                      <span className="text-white font-bold text-xs">@{member.username}</span>
+                      <span className="text-zinc-600 text-[9px]">#{member.discriminator}</span>
+                    </div>
+                    {member.customStatus ? (
+                      <span className="text-[9px] text-zinc-500 truncate max-w-[140px] block mt-0.5" title={member.customStatus}>
+                        "{member.customStatus}"
+                      </span>
+                    ) : (
+                      <span className="text-[8px] text-zinc-650 block mt-0.5 uppercase tracking-wider">SEC_CHANNEL: ACTIVE</span>
+                    )}
+                  </div>
                 </div>
 
-                {/* Clearances matrix */}
-                <div className="pl-2 flex flex-wrap gap-1 font-mono items-center">
-                  <span className="text-[9px] text-zinc-500 mr-1 uppercase">Clearance:</span>
+                {/* Warning Counter and Mute state Badges */}
+                <div className="flex flex-col items-end gap-1 font-mono">
+                  {member.warnings > 0 && (
+                    <span className="px-1.5 py-0.5 rounded text-[8px] font-bold border border-red-500/30 text-red-400 bg-red-950/30 animate-pulse">
+                      WARN {member.warnings}/3
+                    </span>
+                  )}
+                  {member.isMuted && (
+                    <span className="px-1.5 py-0.5 rounded text-[8px] font-bold border border-orange-500/30 text-orange-400 bg-orange-950/30">
+                      QUARANTINE
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* ROLE CLEARANCES BADGE CONTAINER */}
+              <div className="my-4 font-mono text-left">
+                <div className="text-[8px] text-zinc-650 font-bold uppercase tracking-wider mb-1.5">SEC clearance profile:</div>
+                <div className="flex flex-wrap gap-1.5 h-10 overflow-y-auto custom-terminal-scroll pr-1">
                   {memberRoles.map((r) => (
                     <span 
                       key={r.id} 
-                      className="px-1.5 py-0.2 rounded text-[8.5px] font-bold border"
+                      className="px-2 py-0.5 rounded text-[8px] font-semibold border uppercase leading-tight"
                       style={{ 
                         color: r.color, 
                         borderColor: `${r.color}33`, 
@@ -335,74 +212,131 @@ export default function ModerationPanel({ members, roles, onUpdateMember, onRemo
                     </span>
                   ))}
                   {memberRoles.length === 0 && (
-                    <span className="text-zinc-650 text-[9.5px]">Unassigned clearance</span>
+                    <span className="text-zinc-650 text-[9px] uppercase tracking-widest font-semibold">GUEST ACCESS LEVEL</span>
                   )}
-                </div>
-
-                {/* Warnings indicators */}
-                <div className="pl-2 py-1 border-t border-b border-cyan-500/5 flex items-center justify-between font-mono text-[10px]">
-                  <span className="text-zinc-500 uppercase">Warning Register:</span>
-                  <div className="flex items-center gap-1.5">
-                    {Array.from({ length: 3 }).map((_, i) => (
-                      <div 
-                        key={i} 
-                        className={`w-2 h-2 rounded-full border ${
-                          i < member.warnings 
-                            ? 'bg-red-500 border-red-400 shadow-[0_0_5px_rgba(239,68,68,0.7)]' 
-                            : 'bg-transparent border-zinc-800'
-                        }`}
-                      />
-                    ))}
-                    <span className="text-zinc-400 font-semibold ml-1">({member.warnings}/3)</span>
-                  </div>
-                </div>
-
-                {/* Action buttons with massive comfortable touching surface */}
-                <div className="grid grid-cols-2 xs:flex xs:flex-wrap gap-2 pt-1 font-mono text-[10px]">
-                  <button
-                    onClick={() => handleIncrementWarning(member)}
-                    disabled={member.warnings >= 3}
-                    className="p-2 bg-zinc-950 border border-yellow-500/20 text-yellow-500 hover:bg-yellow-950/20 disabled:border-zinc-850 disabled:text-zinc-750 disabled:bg-transparent rounded-lg flex items-center justify-center gap-1 transition-colors cursor-pointer"
-                  >
-                    <ShieldAlert className="w-3.5 h-3.5 inline" />
-                    WARN
-                  </button>
-
-                  {member.warnings > 0 && (
-                    <button
-                      onClick={() => handleClearWarnings(member)}
-                      className="p-2 bg-zinc-950 border border-emerald-500/20 text-emerald-400 hover:bg-emerald-950/20 rounded-lg flex items-center justify-center gap-1 transition-colors cursor-pointer"
-                    >
-                      CLEAR
-                    </button>
-                  )}
-
-                  <button
-                    onClick={() => onRemoveMember(member.id, 'kick')}
-                    disabled={member.id === 'mem-4' || member.id === 'mem-1'}
-                    className="p-2 bg-zinc-950 border border-orange-500/25 text-orange-400 hover:bg-orange-950/20 disabled:border-zinc-850 disabled:text-zinc-750 disabled:bg-transparent rounded-lg flex items-center justify-center gap-1 transition-colors cursor-pointer"
-                  >
-                    <UserMinus className="w-3.5 h-3.5 inline" />
-                    KICK
-                  </button>
-
-                  <button
-                    onClick={() => onRemoveMember(member.id, 'ban')}
-                    disabled={member.id === 'mem-4' || member.id === 'mem-1'}
-                    className="p-2 col-span-2 bg-zinc-950 border border-red-500/25 hover:border-red-400/50 text-red-400 hover:bg-red-950/30 disabled:border-zinc-850 disabled:text-zinc-750 disabled:bg-transparent rounded-lg flex items-center justify-center gap-1 transition-all cursor-pointer"
-                  >
-                    <ShieldX className="w-3.5 h-3.5 inline" />
-                    BAN CITIZEN EXPULSION
-                  </button>
                 </div>
               </div>
-            );
-          })}
-        </div>
+
+              {/* METADATA LAST SEEN & RECON TIMESTAMPS */}
+              <div className="bg-zinc-950/50 border border-cyan-500/5 p-2 rounded-lg mb-4 font-mono text-[9px] space-y-1 text-left">
+                <div className="flex justify-between items-center text-zinc-500">
+                  <span className="flex items-center gap-1 uppercase">
+                    <Radio className="w-3 h-3 text-cyan-400/60" />
+                    SIGNAL STATS:
+                  </span>
+                  <span className={member.status !== 'offline' ? 'text-emerald-400 font-bold' : 'text-zinc-650'}>
+                    {getStatusText(member.status)}
+                  </span>
+                </div>
+                <div className="flex justify-between items-center text-zinc-500">
+                  <span className="flex items-center gap-1 uppercase">
+                    <Clock className="w-3 h-3 text-cyan-400/60" />
+                    SECTOR ENTRY:
+                  </span>
+                  <span className="text-zinc-400">{sectorJoinedDate}</span>
+                </div>
+              </div>
+
+              {/* ACTIONS WORKFLOW BLOCK AND DOUBLE ACTION CONFIRMATIONS */}
+              <div className="mt-auto font-mono text-[9px]">
+                {isConfirming ? (
+                  /* Confirmatory tactical buttons in high-frequency danger states */
+                  <div className="p-2 border border-red-500/30 bg-red-950/15 rounded-lg flex flex-col items-center justify-center gap-2 animate-pulse text-center">
+                    <div className="font-bold text-red-400 flex items-center gap-1">
+                      <HelpCircle className="w-3.5 h-3.5" />
+                      CONFIRM {confirmAction.type.toUpperCase()} PROTOCOL?
+                    </div>
+                    <div className="flex gap-2 w-full mt-1">
+                      <button
+                        onClick={() => executeExpulsion(member.id, confirmAction.type)}
+                        className="flex-1 py-1.5 bg-red-600 border border-red-500 text-white font-bold rounded hover:bg-red-700 transition-colors uppercase cursor-pointer flex items-center justify-center gap-1 text-[8.5px]"
+                      >
+                        <Check className="w-3 h-3" />
+                        CONFIRM
+                      </button>
+                      <button
+                        onClick={() => setConfirmAction(null)}
+                        className="flex-1 py-1.5 bg-zinc-900 border border-cyan-500/20 text-zinc-400 font-bold rounded hover:text-white transition-colors uppercase cursor-pointer flex items-center justify-center gap-1 text-[8.5px]"
+                      >
+                        <X className="w-3 h-3" />
+                        ABORT
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  /* Primary tactical dials and switches */
+                  <div className="flex flex-col gap-2">
+                    <div className="flex gap-2">
+                      {/* Mute and warning adjustments */}
+                      <button
+                        onClick={() => handleToggleMute(member)}
+                        className={`flex-1 py-1.5 rounded border font-bold flex items-center justify-center gap-1 transition-all cursor-pointer ${
+                          member.isMuted
+                            ? 'bg-red-950/30 border-red-500/40 text-red-400'
+                            : 'bg-zinc-950 border border-cyan-500/10 text-zinc-400 hover:border-cyan-400/30 hover:text-white'
+                        }`}
+                      >
+                        {member.isMuted ? (
+                          <>
+                            <VolumeX className="w-3.5 h-3.5 text-red-400" />
+                            UNMUTE
+                          </>
+                        ) : (
+                          <>
+                            <Volume2 className="w-3.5 h-3.5 text-cyan-400/85" />
+                            QUARANTINE
+                          </>
+                        )}
+                      </button>
+
+                      <button
+                        onClick={() => handleIncrementWarning(member)}
+                        disabled={member.warnings >= 3}
+                        className="flex-1 py-1.5 bg-zinc-950 border border-yellow-500/15 text-yellow-500 hover:bg-yellow-950/20 hover:border-yellow-400/40 disabled:border-zinc-900 disabled:text-zinc-700 disabled:bg-transparent rounded flex items-center justify-center gap-1 transition-all cursor-pointer font-bold"
+                        title="Issue warning strike to user log"
+                      >
+                        <ShieldAlert className="w-3.5 h-3.5 text-yellow-500/80" />
+                        WARN (+1)
+                      </button>
+
+                      {member.warnings > 0 && (
+                        <button
+                          onClick={() => handleClearWarnings(member)}
+                          className="px-2 py-1.5 bg-zinc-950 border border-emerald-500/15 text-emerald-400 hover:bg-emerald-950/20 hover:border-emerald-400/40 rounded flex items-center justify-center transition-colors cursor-pointer font-bold"
+                          title="Reset warnings to zero"
+                        >
+                          RESET
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 pt-1 border-t border-cyan-500/5">
+                      {/* Expulsion tactical switches with safety steps */}
+                      <button
+                        onClick={() => setConfirmAction({ memberId: member.id, type: 'kick' })}
+                        className="py-1 bg-transparent border border-orange-500/25 text-orange-400 hover:bg-orange-950/15 hover:border-orange-400/45 rounded flex items-center justify-center gap-1 transition-colors cursor-pointer font-bold text-[8.5px] uppercase"
+                      >
+                        <UserMinus className="w-3 h-3 text-orange-500/80" />
+                        KICK PROTOCOL
+                      </button>
+                      <button
+                        onClick={() => setConfirmAction({ memberId: member.id, type: 'ban' })}
+                        className="py-1 bg-transparent border border-red-500/25 text-red-500 hover:bg-red-950/15 hover:border-red-400/45 rounded flex items-center justify-center gap-1 transition-colors cursor-pointer font-bold text-[8.5px] uppercase shadow-[0_0_4px_rgba(239,68,68,0.05)]"
+                      >
+                        <ShieldX className="w-3 h-3 text-red-500/80" />
+                        BAN PROTOCOL
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          );
+        })}
 
         {filteredMembers.length === 0 && (
-          <div className="p-12 text-center text-zinc-500 font-mono text-xs">
-            No citizens found matching active filters in the records stream.
+          <div className="col-span-1 md:col-span-2 lg:col-span-3 py-16 text-center text-zinc-650 font-mono text-[10px] uppercase tracking-wider animate-pulse border border-dashed border-cyan-500/10 rounded-xl">
+            No secure citizen telemetry lines resolved for this index filter search.
           </div>
         )}
       </div>
