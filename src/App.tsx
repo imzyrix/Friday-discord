@@ -295,7 +295,7 @@ export default function App() {
       <main className="flex-1 relative z-10 p-6 max-w-7xl w-full mx-auto flex flex-col gap-6">
         
         {/* Top-level Holographic Bento KPI Counters */}
-        <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -406,7 +406,7 @@ export default function App() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.25 }}
-            className="p-4 rounded-xl bg-zinc-950/80 border border-orange-500/20 hover:border-orange-400/50 shadow-[0_0_15px_rgba(249,115,22,0.06)] hover:shadow-[0_0_20px_rgba(249,115,22,0.12)] transition-all flex items-center justify-between gap-3 relative overflow-hidden group col-span-2 lg:col-span-1"
+            className="p-4 rounded-xl bg-zinc-950/80 border border-orange-500/20 hover:border-orange-400/50 shadow-[0_0_15px_rgba(249,115,22,0.06)] hover:shadow-[0_0_20px_rgba(249,115,22,0.12)] transition-all flex items-center justify-between gap-3 relative overflow-hidden group sm:col-span-2 lg:col-span-1"
           >
             <div className="absolute top-0 left-0 right-0 h-[2px] bg-orange-400/65"></div>
             <div>

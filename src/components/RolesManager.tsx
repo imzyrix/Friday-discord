@@ -85,9 +85,9 @@ export default function RolesManager({ roles, onCreateRole, onUpdateRole, onDele
       {/* Grid backlight */}
       <div className="absolute inset-0 bg-[linear-gradient(rgba(18,18,18,0)_50%,rgba(6,182,212,0.01)_50%)] bg-[size:100%_4px] pointer-events-none opacity-40"></div>
       
-      <div className="flex justify-between items-center mb-6 z-10">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 z-10">
         <div>
-          <h2 className="text-lg font-bold text-white tracking-wide font-sans flex items-center gap-2">
+          <h2 className="text-lg font-bold text-white tracking-wide font-sans flex flex-wrap items-center gap-2">
             <span className="p-1 px-2 text-xs font-mono font-bold uppercase rounded bg-cyan-950/50 text-cyan-400 border border-cyan-500/20">Access Grid</span>
             GUILD ADMINISTRATIVE ROLES
           </h2>
@@ -96,10 +96,10 @@ export default function RolesManager({ roles, onCreateRole, onUpdateRole, onDele
           </p>
         </div>
 
-        <div className="flex bg-zinc-900 border border-cyan-500/20 rounded-lg p-1 z-10 font-mono text-xs">
+        <div className="flex bg-zinc-900 border border-cyan-500/20 rounded-lg p-1 z-10 font-mono text-xs w-full md:w-auto self-stretch md:self-auto justify-center">
           <button
             onClick={() => setActiveTab('list')}
-            className={`px-3 py-1.5 rounded-md font-bold transition-all ${
+            className={`flex-1 md:flex-initial text-center px-3 py-1.5 rounded-md font-bold transition-all cursor-pointer ${
               activeTab === 'list'
                 ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-400/20'
                 : 'text-zinc-400 hover:text-white'
@@ -109,7 +109,7 @@ export default function RolesManager({ roles, onCreateRole, onUpdateRole, onDele
           </button>
           <button
             onClick={() => setActiveTab('create')}
-            className={`px-3 py-1.5 rounded-md font-bold transition-all flex items-center gap-1 ${
+            className={`flex-1 md:flex-initial text-center px-3 py-1.5 rounded-md font-bold transition-all flex items-center justify-center gap-1 cursor-pointer ${
               activeTab === 'create'
                 ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-400/20'
                 : 'text-zinc-400 hover:text-white'
@@ -135,28 +135,28 @@ export default function RolesManager({ roles, onCreateRole, onUpdateRole, onDele
                   style={{ backgroundColor: role.color }}
                 ></div>
 
-                <div className="flex flex-wrap justify-between items-center gap-3">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                   <div className="flex items-center gap-2.5">
                     {/* Glowing role color indicators tag */}
                     <div 
-                      className="w-3.5 h-3.5 rounded-full shadow-[0_0_8px_currentColor]" 
+                      className="w-3.5 h-3.5 rounded-full shadow-[0_0_8px_currentColor] shrink-0" 
                       style={{ color: role.color, backgroundColor: role.color }}
                     />
-                    <div>
+                    <div className="flex flex-wrap items-center gap-2">
                       <span className="text-white font-mono font-semibold text-sm">{role.name}</span>
-                      <span className="text-[10px] font-mono text-cyan-500 bg-cyan-950/40 border border-cyan-500/20 px-1.5 py-0.5 rounded ml-2.5">
+                      <span className="text-[10px] font-mono text-cyan-400 bg-cyan-950/40 border border-cyan-500/20 px-1.5 py-0.5 rounded">
                         {role.memberCount} citizens
                       </span>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4 font-mono text-xs text-zinc-400">
-                    <label className="flex items-center gap-1.5 cursor-pointer">
+                  <div className="flex flex-wrap items-center gap-4 font-mono text-xs text-zinc-400 w-full sm:w-auto justify-between sm:justify-end">
+                    <label className="flex items-center gap-1.5 cursor-pointer select-none">
                       <input
                         type="checkbox"
                         checked={role.hoist}
                         onChange={(e) => onUpdateRole(role.id, { hoist: e.target.checked })}
-                        className="rounded border-cyan-500/30 text-cyan-500 bg-zinc-950 focus:ring-0 w-3.5 h-3.5"
+                        className="rounded border-cyan-500/30 text-cyan-500 bg-zinc-950 focus:ring-0 w-3.5 h-3.5 cursor-pointer"
                       />
                       <span>HOIST ACCESS</span>
                     </label>
@@ -164,19 +164,19 @@ export default function RolesManager({ roles, onCreateRole, onUpdateRole, onDele
                     <div className="flex gap-2.5">
                       <button
                         onClick={() => setEditingRoleId(editingRoleId === role.id ? null : role.id)}
-                        className="p-1 px-2.5 bg-zinc-900 border border-cyan-500/20 rounded text-cyan-300 hover:bg-cyan-950/40 transition-colors flex items-center gap-1 text-[10px]"
+                        className="p-1.5 px-2.5 bg-zinc-900 border border-cyan-500/20 rounded text-cyan-300 hover:bg-cyan-950/40 hover:border-cyan-400/40 transition-colors flex items-center gap-1 text-[10px] cursor-pointer font-bold"
                       >
-                        <Settings className="w-3 h-3" />
+                        <Settings className="w-3.5 h-3.5" />
                         PERMS MATRIX
                       </button>
 
                       <button
                         onClick={() => onDeleteRole(role.id)}
                         disabled={role.id === 'role-admin'}
-                        className="p-1 bg-zinc-900 border border-red-500/20 rounded text-red-400 hover:bg-red-950/20 disabled:opacity-30 disabled:pointer-events-none transition-colors"
+                        className="p-1.5 bg-zinc-900 border border-red-500/20 rounded text-red-400 hover:bg-red-950/20 hover:border-red-500/40 disabled:opacity-30 disabled:pointer-events-none transition-colors cursor-pointer"
                         title="Delete Role"
                       >
-                        <Trash2 className="w-3 h-3" />
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </div>
