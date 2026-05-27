@@ -1,0 +1,6 @@
+{
+  "name": "F.R.I.D.A.Y. Discord Admin Core",
+  "description": "A Jarvis-themed futuristic, holographic Discord dashboard for managing roles, real-time member moderation, secure encrypted logs/backups, and automated support ticket sequences.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
