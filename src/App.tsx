@@ -25,6 +25,12 @@ import ModerationPanel from './components/ModerationPanel';
 import TerminalLog from './components/TerminalLog';
 import FridayConsole from './components/FridayConsole';
 
+// React Bits animations
+import ShinyText from './components/animations/ShinyText';
+import SplitText from './components/animations/SplitText';
+import SpotlightCard from './components/animations/SpotlightCard';
+import LetterGlitch from './components/animations/LetterGlitch';
+
 // Shared Types
 import { Role, Member, AuditLog, SupportTicket, BackupRecord, BotDiagnostic } from './types';
 
@@ -248,10 +254,14 @@ export default function App() {
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-sm font-bold tracking-widest font-mono text-white">F.R.I.D.A.Y. ADMIN UNIT</h1>
+              <h1 className="text-sm font-bold tracking-widest font-mono text-white">
+                <LetterGlitch text="F.R.I.D.A.Y. ADMIN UNIT" speed={45} glitchTrigger="hover" className="cursor-pointer" />
+              </h1>
               <span className="text-[9px] font-mono bg-cyan-950 text-cyan-400 border border-cyan-500/30 px-1.5 py-0.2 rounded font-bold uppercase tracking-wider">v4.2.0</span>
             </div>
-            <p className="text-[10px] text-zinc-500 font-mono tracking-wider">SECURITY & MODERATION COGNITIVE CORE</p>
+            <p className="text-[10px] text-zinc-500 font-mono tracking-wider">
+              <ShinyText text="SECURITY & MODERATION COGNITIVE CORE" speed={6} />
+            </p>
           </div>
         </div>
 
@@ -300,125 +310,156 @@ export default function App() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.05 }}
-            className="p-4 rounded-xl bg-zinc-950/80 border border-cyan-500/20 hover:border-cyan-400/50 shadow-[0_0_15px_rgba(6,182,212,0.06)] hover:shadow-[0_0_20px_rgba(6,182,212,0.12)] transition-all flex items-center justify-between gap-3 relative overflow-hidden group"
+            className="h-full"
           >
-            <div className="absolute top-0 left-0 right-0 h-[2px] bg-cyan-400/65"></div>
-            <div>
-              <span className="text-[9px] font-mono text-zinc-500 font-bold uppercase block tracking-wider">TOTAL CITIZENS</span>
-              <span className="text-2xl font-bold font-mono tracking-tight text-white mt-1 block select-all">{members.length}</span>
-              <span className="text-[8.5px] font-mono text-cyan-400 block mt-1 tracking-tighter">
-                {members.filter(m => m.status === 'online').length} SECTOR CONTACTS
-              </span>
-            </div>
-            <div className="p-2 bg-cyan-950/40 rounded-lg border border-cyan-500/20 text-cyan-400 group-hover:scale-110 transition-transform">
-              <Users className="w-5 h-5" />
-            </div>
+            <SpotlightCard 
+              spotlightColor="rgba(6, 182, 212, 0.15)"
+              className="p-4 rounded-xl bg-zinc-950/80 border border-cyan-500/20 hover:border-cyan-400/50 shadow-[0_0_15px_rgba(6,182,212,0.06)] hover:shadow-[0_0_20px_rgba(6,182,212,0.12)] flex items-center justify-between gap-3 relative overflow-hidden group h-full cursor-pointer select-none"
+            >
+              <div className="absolute top-0 left-0 right-0 h-[2px] bg-cyan-400/65"></div>
+              <div>
+                <span className="text-[9px] font-mono text-zinc-500 font-bold uppercase block tracking-wider">TOTAL CITIZENS</span>
+                <span className="text-2xl font-bold font-mono tracking-tight text-white mt-1 block select-all">
+                  <SplitText text={String(members.length)} />
+                </span>
+                <span className="text-[8.5px] font-mono text-cyan-400 block mt-1 tracking-tighter">
+                  {members.filter(m => m.status === 'online').length} SECTOR CONTACTS
+                </span>
+              </div>
+              <div className="p-2 bg-cyan-950/40 rounded-lg border border-cyan-500/20 text-cyan-400 group-hover:scale-110 transition-transform">
+                <Users className="w-5 h-5" />
+              </div>
+            </SpotlightCard>
           </motion.div>
 
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.1 }}
-            className="p-4 rounded-xl bg-zinc-950/80 border border-cyan-500/20 hover:border-cyan-400/50 shadow-[0_0_15px_rgba(6,182,212,0.06)] hover:shadow-[0_0_20px_rgba(6,182,212,0.12)] transition-all flex items-center justify-between gap-3 relative overflow-hidden group"
+            className="h-full"
           >
-            <div className="absolute top-0 left-0 right-0 h-[2px] bg-cyan-400/65"></div>
-            <div>
-              <span className="text-[9px] font-mono text-zinc-500 font-bold uppercase block tracking-wider">CLEARANCE ROLES</span>
-              <span className="text-2xl font-bold font-mono tracking-tight text-white mt-1 block select-all">{roles.length}</span>
-              <span className="text-[8.5px] font-mono text-cyan-400 block mt-1 tracking-tighter">
-                {roles.filter(r => r.hoist).length} HOIST PRIVILEGES
-              </span>
-            </div>
-            <div className="p-2 bg-cyan-950/40 rounded-lg border border-cyan-500/20 text-cyan-400 group-hover:scale-110 transition-transform">
-              <Shield className="w-5 h-5" />
-            </div>
+            <SpotlightCard 
+              spotlightColor="rgba(6, 182, 212, 0.15)"
+              className="p-4 rounded-xl bg-zinc-950/80 border border-cyan-500/20 hover:border-cyan-400/50 shadow-[0_0_15px_rgba(6,182,212,0.06)] hover:shadow-[0_0_20px_rgba(6,182,212,0.12)] flex items-center justify-between gap-3 relative overflow-hidden group h-full cursor-pointer select-none"
+            >
+              <div className="absolute top-0 left-0 right-0 h-[2px] bg-cyan-400/65"></div>
+              <div>
+                <span className="text-[9px] font-mono text-zinc-500 font-bold uppercase block tracking-wider">CLEARANCE ROLES</span>
+                <span className="text-2xl font-bold font-mono tracking-tight text-white mt-1 block select-all">
+                  <SplitText text={String(roles.length)} />
+                </span>
+                <span className="text-[8.5px] font-mono text-cyan-400 block mt-1 tracking-tighter">
+                  {roles.filter(r => r.hoist).length} HOIST PRIVILEGES
+                </span>
+              </div>
+              <div className="p-2 bg-cyan-950/40 rounded-lg border border-cyan-500/20 text-cyan-400 group-hover:scale-110 transition-transform">
+                <Shield className="w-5 h-5" />
+              </div>
+            </SpotlightCard>
           </motion.div>
 
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.15 }}
-            className={`p-4 rounded-xl bg-zinc-950/80 border hover:border-red-400/50 transition-all flex items-center justify-between gap-3 relative overflow-hidden group ${
-              members.reduce((sum, m) => sum + m.warnings, 0) > 0 
-                ? 'border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.08)]' 
-                : 'border-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.06)]'
-            }`}
+            className="h-full"
           >
-            <div className={`absolute top-0 left-0 right-0 h-[2px] ${
-              members.reduce((sum, m) => sum + m.warnings, 0) > 0 ? 'bg-red-500/75 animate-pulse' : 'bg-cyan-400/65'
-            }`}></div>
-            <div>
-              <span className="text-[9px] font-mono text-zinc-500 font-bold uppercase block tracking-wider">THREAT LEVEL</span>
-              <span className={`text-2xl font-bold font-mono tracking-tight mt-1 block select-all ${
-                members.reduce((sum, m) => sum + m.warnings, 0) > 0 ? 'text-red-400' : 'text-white'
+            <SpotlightCard 
+              spotlightColor={members.reduce((sum, m) => sum + m.warnings, 0) > 0 ? "rgba(239, 68, 68, 0.15)" : "rgba(6, 182, 212, 0.15)"}
+              className={`p-4 rounded-xl bg-zinc-950/80 border flex items-center justify-between gap-3 relative overflow-hidden group h-full cursor-pointer select-none transition-all ${
+                members.reduce((sum, m) => sum + m.warnings, 0) > 0 
+                  ? 'border-red-500/30 shadow-[0_0_15px_rgba(239,68,68,0.08)] hover:border-red-400/50' 
+                  : 'border-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.06)] hover:border-cyan-400/50'
+              }`}
+            >
+              <div className={`absolute top-0 left-0 right-0 h-[2px] ${
+                members.reduce((sum, m) => sum + m.warnings, 0) > 0 ? 'bg-red-500/75 animate-pulse' : 'bg-cyan-400/65'
+              }`}></div>
+              <div>
+                <span className="text-[9px] font-mono text-zinc-500 font-bold uppercase block tracking-wider">THREAT LEVEL</span>
+                <span className={`text-2xl font-bold font-mono tracking-tight mt-1 block select-all ${
+                  members.reduce((sum, m) => sum + m.warnings, 0) > 0 ? 'text-red-400' : 'text-white'
+                }`}>
+                  <SplitText text={`${members.reduce((sum, m) => sum + m.warnings, 0)} WARNS`} />
+                </span>
+                <span className={`text-[8.5px] font-mono block mt-1 tracking-tighter ${
+                  members.reduce((sum, m) => sum + m.warnings, 0) > 0 ? 'text-red-400 animate-pulse font-bold' : 'text-emerald-400'
+                }`}>
+                  {members.reduce((sum, m) => sum + m.warnings, 0) > 0 ? 'ATTENTION REQUIRED' : 'GRID STAT: SECURE'}
+                </span>
+              </div>
+              <div className={`p-2 rounded-lg border group-hover:scale-110 transition-transform ${
+                members.reduce((sum, m) => sum + m.warnings, 0) > 0 
+                  ? 'bg-red-950/30 border-red-500/30 text-red-400' 
+                  : 'bg-cyan-950/40 border-cyan-500/20 text-cyan-400'
               }`}>
-                {members.reduce((sum, m) => sum + m.warnings, 0)} WARNS
-              </span>
-              <span className={`text-[8.5px] font-mono block mt-1 tracking-tighter ${
-                members.reduce((sum, m) => sum + m.warnings, 0) > 0 ? 'text-red-400 animate-pulse font-bold' : 'text-emerald-400'
-              }`}>
-                {members.reduce((sum, m) => sum + m.warnings, 0) > 0 ? 'ATTENTION REQUIRED' : 'GRID STAT: SECURE'}
-              </span>
-            </div>
-            <div className={`p-2 rounded-lg border text-cyan-400 group-hover:scale-110 transition-transform ${
-              members.reduce((sum, m) => sum + m.warnings, 0) > 0 
-                ? 'bg-red-950/30 border-red-500/30 text-red-400' 
-                : 'bg-cyan-950/40 border-cyan-500/20 text-cyan-400'
-            }`}>
-              <AlertTriangle className="w-5 h-5" />
-            </div>
+                <AlertTriangle className="w-5 h-5" />
+              </div>
+            </SpotlightCard>
           </motion.div>
 
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.2 }}
-            className={`p-4 rounded-xl bg-zinc-950/80 border hover:border-cyan-400/50 transition-all flex items-center justify-between gap-3 relative overflow-hidden group ${
-              tickets.filter(t => t.status !== 'resolved').length > 0
-                ? 'border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.08)]'
-                : 'border-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.06)]'
-            }`}
+            className="h-full"
           >
-            <div className={`absolute top-0 left-0 right-0 h-[2px] ${
-              tickets.filter(t => t.status !== 'resolved').length > 0 ? 'bg-amber-400/75' : 'bg-cyan-400/65'
-            }`}></div>
-            <div>
-              <span className="text-[9px] font-mono text-zinc-500 font-bold uppercase block tracking-wider">OPEN CONDUITS</span>
-              <span className="text-2xl font-bold font-mono tracking-tight text-white mt-1 block select-all">
-                {tickets.filter(t => t.status !== 'resolved').length}
-              </span>
-              <span className={`text-[8.5px] font-mono block mt-1 tracking-tighter ${
-                tickets.filter(t => t.status !== 'resolved').length > 0 ? 'text-amber-400 font-bold' : 'text-cyan-400'
+            <SpotlightCard 
+              spotlightColor={tickets.filter(t => t.status !== 'resolved').length > 0 ? "rgba(245, 158, 11, 0.15)" : "rgba(6, 182, 212, 0.15)"}
+              className={`p-4 rounded-xl bg-zinc-950/80 border flex items-center justify-between gap-3 relative overflow-hidden group h-full cursor-pointer select-none transition-all ${
+                tickets.filter(t => t.status !== 'resolved').length > 0
+                  ? 'border-amber-500/30 shadow-[0_0_15px_rgba(245,158,11,0.08)] hover:border-amber-400/50'
+                  : 'border-cyan-500/20 shadow-[0_0_15px_rgba(6,182,212,0.06)] hover:border-cyan-400/50'
+              }`}
+            >
+              <div className={`absolute top-0 left-0 right-0 h-[2px] ${
+                tickets.filter(t => t.status !== 'resolved').length > 0 ? 'bg-amber-400/75' : 'bg-cyan-400/65'
+              }`}></div>
+              <div>
+                <span className="text-[9px] font-mono text-zinc-500 font-bold uppercase block tracking-wider">OPEN CONDUITS</span>
+                <span className="text-2xl font-bold font-mono tracking-tight text-white mt-1 block select-all">
+                  <SplitText text={String(tickets.filter(t => t.status !== 'resolved').length)} />
+                </span>
+                <span className={`text-[8.5px] font-mono block mt-1 tracking-tighter ${
+                  tickets.filter(t => t.status !== 'resolved').length > 0 ? 'text-amber-400 font-bold' : 'text-cyan-400'
+                }`}>
+                  {tickets.filter(t => t.status !== 'resolved').length > 0 ? 'F.R.I.D.A.Y TASK PENDING' : 'CHANNELS STABLE'}
+                </span>
+              </div>
+              <div className={`p-2 rounded-lg border group-hover:scale-110 transition-transform ${
+                tickets.filter(t => t.status !== 'resolved').length > 0
+                  ? 'bg-amber-950/30 border-amber-500/30 text-amber-400'
+                  : 'bg-cyan-950/40 border-cyan-500/20 text-cyan-400'
               }`}>
-                {tickets.filter(t => t.status !== 'resolved').length > 0 ? 'F.R.I.D.A.Y TASK PENDING' : 'CHANNELS STABLE'}
-              </span>
-            </div>
-            <div className={`p-2 rounded-lg border group-hover:scale-110 transition-transform ${
-              tickets.filter(t => t.status !== 'resolved').length > 0
-                ? 'bg-amber-950/30 border-amber-500/30 text-amber-400'
-                : 'bg-cyan-950/40 border-cyan-500/20 text-cyan-400'
-            }`}>
-              <Cpu className="w-5 h-5" />
-            </div>
+                <Cpu className="w-5 h-5" />
+              </div>
+            </SpotlightCard>
           </motion.div>
 
           <motion.div 
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.25 }}
-            className="p-4 rounded-xl bg-zinc-950/80 border border-orange-500/20 hover:border-orange-400/50 shadow-[0_0_15px_rgba(249,115,22,0.06)] hover:shadow-[0_0_20px_rgba(249,115,22,0.12)] transition-all flex items-center justify-between gap-3 relative overflow-hidden group sm:col-span-2 lg:col-span-1"
+            className="sm:col-span-2 lg:col-span-1 h-full"
           >
-            <div className="absolute top-0 left-0 right-0 h-[2px] bg-orange-400/65"></div>
-            <div>
-              <span className="text-[9px] font-mono text-zinc-500 font-bold uppercase block tracking-wider">SEALED SNAPSHOTS</span>
-              <span className="text-2xl font-bold font-mono tracking-tight text-white mt-1 block select-all">{backups.length}</span>
-              <span className="text-[8.5px] font-mono text-orange-400 block mt-1 tracking-tighter">
-                AES-GCM ENCRYPTED
-              </span>
-            </div>
-            <div className="p-2 bg-orange-950/40 rounded-lg border border-orange-500/20 text-orange-400 group-hover:scale-110 transition-transform">
-              <Database className="w-5 h-5" />
-            </div>
+            <SpotlightCard 
+              spotlightColor="rgba(249, 115, 22, 0.15)"
+              className="p-4 rounded-xl bg-zinc-950/80 border border-orange-500/20 hover:border-orange-400/50 shadow-[0_0_15px_rgba(249,115,22,0.06)] hover:shadow-[0_0_20px_rgba(249,115,22,0.12)] flex items-center justify-between gap-3 relative overflow-hidden group h-full cursor-pointer select-none"
+            >
+              <div className="absolute top-0 left-0 right-0 h-[2px] bg-orange-400/65"></div>
+              <div>
+                <span className="text-[9px] font-mono text-zinc-500 font-bold uppercase block tracking-wider">SEALED SNAPSHOTS</span>
+                <span className="text-2xl font-bold font-mono tracking-tight text-white mt-1 block select-all">
+                  <SplitText text={String(backups.length)} />
+                </span>
+                <span className="text-[8.5px] font-mono text-orange-400 block mt-1 tracking-tighter">
+                  AES-GCM ENCRYPTED
+                </span>
+              </div>
+              <div className="p-2 bg-orange-950/40 rounded-lg border border-orange-500/20 text-orange-400 group-hover:scale-110 transition-transform">
+                <Database className="w-5 h-5" />
+              </div>
+            </SpotlightCard>
           </motion.div>
         </div>
 

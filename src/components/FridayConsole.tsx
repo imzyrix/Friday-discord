@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { Bot, Radio, Send, LifeBuoy, CheckCircle, PlusCircle, BrainCircuit, ShieldAlert } from 'lucide-react';
 import { SupportTicket } from '../types';
 
+import ShinyText from './animations/ShinyText';
+import LetterGlitch from './animations/LetterGlitch';
+
 interface FridayConsoleProps {
   tickets: SupportTicket[];
   onSubmitTicketReply: (id: string, text: string, sender: 'user' | 'friday') => Promise<any>;
@@ -106,8 +109,8 @@ export default function FridayConsole({
         <div className="flex justify-between items-center pb-2 border-b border-cyan-500/10">
           <div>
             <h3 className="text-xs font-bold text-cyan-400 font-mono tracking-widest uppercase flex items-center gap-1.5">
-              <LifeBuoy className="w-4 h-4 text-cyan-400" />
-              SUPPORT CONDUIT INDEX
+              <LifeBuoy className="w-4 h-4 text-cyan-400 animate-pulse" />
+              <LetterGlitch text="SUPPORT CONDUIT INDEX" speed={45} glitchTrigger="hover" className="cursor-pointer" />
             </h3>
             <span className="text-[10px] text-zinc-500 font-mono block mt-0.5">Automated queue channels</span>
           </div>
@@ -301,7 +304,7 @@ export default function FridayConsole({
         <div>
           <h3 className="text-xs font-bold text-cyan-400 font-mono tracking-widest uppercase flex items-center gap-1.5">
             <BrainCircuit className="w-4 h-4 text-cyan-400 animate-pulse" />
-            F.R.I.D.A.Y. AUTOMATOR (GEMINI COGNITIVE ACTION PANEL)
+            <LetterGlitch text="F.R.I.D.A.Y. AUTOMATOR (GEMINI COGNITIVE ACTION PANEL)" speed={45} glitchTrigger="hover" className="cursor-pointer" />
           </h3>
           <p className="text-[10px] text-zinc-400 font-mono mt-0.5">
             Command F.R.I.D.A.Y. to plan security parameters, onboarding sequences, or custom administrative structures.

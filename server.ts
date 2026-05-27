@@ -4,6 +4,7 @@ import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
+import fs from 'fs';
 
 // Load variables from .env
 dotenv.config();
@@ -19,13 +20,58 @@ import {
 
 import { Role, Member, AuditLog, SupportTicket, BackupRecord, BotDiagnostic } from './src/types';
 
-// State Persistence Container
-let roles: Role[] = [...initialRoles];
-let members: Member[] = [...initialMembers];
-let logs: AuditLog[] = [...initialLogs];
-let tickets: SupportTicket[] = [...initialTickets];
-let backups: BackupRecord[] = [...initialBackups];
+// State Persistence Container - Persistent JSON storage on disk
+const DB_FILE_PATH = path.join(process.cwd(), 'database_state.json');
+
+let roles: Role[] = [];
+let members: Member[] = [];
+let logs: AuditLog[] = [];
+let tickets: SupportTicket[] = [];
+let backups: BackupRecord[] = [];
 let diagnostic: BotDiagnostic = { ...initialDiagnostic };
+
+function loadDatabaseState() {
+  try {
+    if (fs.existsSync(DB_FILE_PATH)) {
+      const dbContent = fs.readFileSync(DB_FILE_PATH, 'utf8');
+      const data = JSON.parse(dbContent);
+      roles = data.roles || [...initialRoles];
+      members = data.members || [...initialMembers];
+      logs = data.logs || [...initialLogs];
+      tickets = data.tickets || [...initialTickets];
+      backups = data.backups || [...initialBackups];
+      diagnostic = data.diagnostic || { ...initialDiagnostic };
+      console.log('Successfully synchronized server data from persistent database_state.json storage');
+    } else {
+      resetDatabaseToDefault();
+    }
+  } catch (err) {
+    console.error('Error loading persistent database_state.json, falling back to memory state:', err);
+    resetDatabaseToDefault();
+  }
+}
+
+function resetDatabaseToDefault() {
+  roles = [...initialRoles];
+  members = [...initialMembers];
+  logs = [...initialLogs];
+  tickets = [...initialTickets];
+  backups = [...initialBackups];
+  diagnostic = { ...initialDiagnostic };
+  saveDatabaseState();
+}
+
+function saveDatabaseState() {
+  try {
+    const data = { roles, members, logs, tickets, backups, diagnostic };
+    fs.writeFileSync(DB_FILE_PATH, JSON.stringify(data, null, 2), 'utf8');
+  } catch (err) {
+    console.error('Error saving state to database_state.json:', err);
+  }
+}
+
+// Instantiate storage state immediately on startup
+loadDatabaseState();
 
 // Real-time Event Subscription List
 let sseClients: express.Response[] = [];
@@ -36,6 +82,10 @@ function broadcastToClients(type: string, payload: any) {
   sseClients.forEach((client) => {
     client.write(`data: ${dataString}\n\n`);
   });
+  // Genuinely persist functional states to storage disk (bypass frequent diagnostic polls to reduce overhead)
+  if (type !== 'SYNC_DIAGNOSTIC') {
+    saveDatabaseState();
+  }
 }
 
 // Generate automatic audit logs

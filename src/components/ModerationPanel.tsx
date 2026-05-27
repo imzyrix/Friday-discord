@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { Shield, ShieldAlert, ShieldX, VolumeX, Volume2, UserX, Trash2, Search, UserMinus } from 'lucide-react';
 import { Member, Role } from '../types';
 
+import ShinyText from './animations/ShinyText';
+import LetterGlitch from './animations/LetterGlitch';
+
 interface ModerationPanelProps {
   members: Member[];
   roles: Role[];
@@ -55,10 +58,10 @@ export default function ModerationPanel({ members, roles, onUpdateMember, onRemo
         <div>
           <h2 className="text-lg font-bold text-white tracking-wide font-sans flex items-center gap-2">
             <span className="p-1 px-2 text-xs font-mono font-bold uppercase rounded bg-red-950/50 text-red-400 border border-red-500/20">Quarantine</span>
-            CITIZEN MODERATION TERMINAL
+            <LetterGlitch text="CITIZEN MODERATION TERMINAL" speed={45} glitchTrigger="hover" className="cursor-pointer" />
           </h2>
           <p className="text-xs text-zinc-400 font-mono mt-1">
-            Conduct status audits, security briefings, and apply containment countermeasures.
+            <ShinyText text="Conduct status audits, security briefings, and apply containment countermeasures." speed={9} />
           </p>
         </div>
 

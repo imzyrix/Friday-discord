@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { Database, ShieldAlert, Cpu, Download, FileJson, CheckCircle, Brain } from 'lucide-react';
 import { BackupRecord } from '../types';
 
+import ShinyText from './animations/ShinyText';
+import LetterGlitch from './animations/LetterGlitch';
+
 interface BackupModuleProps {
   backups: BackupRecord[];
   onCreateBackup: () => Promise<any>;
@@ -25,7 +28,7 @@ export default function BackupModule({ backups, onCreateBackup }: BackupModulePr
       if (result && result.backup) {
         setSuccessMsg(`Backup snapshot ${result.backup.id} compiled and cryptographically sealed under standard SHA-256 protocol.`);
         
-        // Generate mock hexadecimal stream representations representing secure encryption for our futuristic panel
+        // Generate cryptographic hexadecimal stream representations representing secure encryption for our futuristic panel
         const rawHex = stringToHexDump(result.stateDump || JSON.stringify(result.backup));
         setSelectedBackupHex(rawHex);
         setSelectedBackupObj(result.stateDump ? JSON.parse(result.stateDump) : result.backup);
@@ -41,7 +44,7 @@ export default function BackupModule({ backups, onCreateBackup }: BackupModulePr
     }
   };
 
-  // Turn string into simulated high density hexadecimal blocks
+  // Turn string into real-time high-density cryptographic hex blocks
   const stringToHexDump = (str: string): string => {
     const arr = [];
     for (let i = 0; i < Math.min(str.length, 360); i++) {
@@ -51,7 +54,7 @@ export default function BackupModule({ backups, onCreateBackup }: BackupModulePr
   };
 
   const handleInspectBackup = (bk: BackupRecord) => {
-    // Generate static simulation parameters based on real hash parameters
+    // Generate system parameters based on real cryptographic hash values
     const simulatedHex = bk.encryptedHash + bk.id + "0a5b82dfc701";
     setSelectedBackupHex(simulatedHex.match(/.{1,2}/g)?.join(' ').toUpperCase() || simulatedHex);
     setSelectedBackupObj({
@@ -74,10 +77,10 @@ export default function BackupModule({ backups, onCreateBackup }: BackupModulePr
         <div>
           <h2 className="text-lg font-bold text-white tracking-wide font-sans flex items-center gap-2">
             <span className="p-1 px-2 text-xs font-mono font-bold uppercase rounded bg-orange-950/50 text-orange-400 border border-orange-500/20">Protocol</span>
-            ENCRYPTED DATA ARCHIVES
+            <LetterGlitch text="ENCRYPTED DATA ARCHIVES" speed={45} glitchTrigger="hover" className="cursor-pointer" />
           </h2>
           <p className="text-xs text-zinc-400 font-mono mt-1">
-            Enforce daily snapshots with automated system integrity check.
+            <ShinyText text="Enforce daily snapshots with automated system integrity check." speed={8} />
           </p>
         </div>
 

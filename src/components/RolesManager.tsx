@@ -3,6 +3,9 @@ import { Shield, Plus, Trash2, Eye, Compass, Settings, Check } from 'lucide-reac
 import { motion } from 'motion/react';
 import { Role } from '../types';
 
+import ShinyText from './animations/ShinyText';
+import LetterGlitch from './animations/LetterGlitch';
+
 interface RolesManagerProps {
   roles: Role[];
   onCreateRole: (role: Partial<Role>) => Promise<any>;
@@ -89,10 +92,10 @@ export default function RolesManager({ roles, onCreateRole, onUpdateRole, onDele
         <div>
           <h2 className="text-lg font-bold text-white tracking-wide font-sans flex flex-wrap items-center gap-2">
             <span className="p-1 px-2 text-xs font-mono font-bold uppercase rounded bg-cyan-950/50 text-cyan-400 border border-cyan-500/20">Access Grid</span>
-            GUILD ADMINISTRATIVE ROLES
+            <LetterGlitch text="GUILD ADMINISTRATIVE ROLES" speed={45} glitchTrigger="hover" className="cursor-pointer" />
           </h2>
           <p className="text-xs text-zinc-400 font-mono mt-1">
-            Reconfigure permissions, hierarchy, and cryptographic hoist tags.
+            <ShinyText text="Reconfigure permissions, hierarchy, and cryptographic hoist tags." speed={7} />
           </p>
         </div>
 
