@@ -56,23 +56,42 @@ export default function HudDisplay({ diagnostic }: HudProps) {
         </div>
 
         {/* The rotating radar visualizer */}
-        <div className="relative w-40 h-40 flex items-center justify-center my-3">
+        <div className="relative w-44 h-44 flex items-center justify-center my-3">
           {/* Circular grid lines */}
           <div className="absolute inset-0 rounded-full border border-dashed border-cyan-500/20"></div>
           <div className="absolute inset-4 rounded-full border border-cyan-500/10"></div>
-          <div className="absolute inset-8 rounded-full border border-dashed border-cyan-500/15"></div>
-          <div className="absolute inset-16 rounded-full border border-cyan-400/10"></div>
+          <div className="absolute inset-10 rounded-full border border-dashed border-cyan-500/15"></div>
+          <div className="absolute inset-20 rounded-full border border-cyan-400/10"></div>
           
           {/* Axis indicators */}
-          <div className="absolute h-full w-[1px] bg-cyan-500/10"></div>
-          <div className="absolute w-full h-[1px] bg-cyan-500/10"></div>
+          <div className="absolute h-full w-[1px] bg-[linear-gradient(to_bottom,transparent,rgba(6,182,212,0.15)_20%,rgba(6,182,212,0.15)_80%,transparent)]"></div>
+          <div className="absolute w-full h-[1px] bg-[linear-gradient(to_right,transparent,rgba(6,182,212,0.15)_20%,rgba(6,182,212,0.15)_80%,transparent)]"></div>
 
-          {/* Sweeping holographic wedge using Framer Motion instead of high CPU intervals */}
+          {/* Concentric telemetry circles */}
+          <div className="absolute -inset-2.5 rounded-full border border-cyan-500/5 animate-pulse"></div>
+
+          {/* Sweeping holographic wedge using Framer Motion */}
           <motion.div 
-            className="absolute inset-0 rounded-full bg-gradient-to-tr from-cyan-500/0 via-cyan-500/0 to-cyan-400/25 pointer-events-none"
+            className="absolute inset-0 rounded-full bg-gradient-to-tr from-cyan-500/0 via-cyan-500/0 to-cyan-400/20 pointer-events-none"
             animate={{ rotate: 360 }}
             transition={{ repeat: Infinity, duration: 4, ease: "linear" }}
           ></motion.div>
+
+          {/* Floating HUD coordinate targets to fulfill Cyberpunk Tactical Style */}
+          <div className="absolute inset-0 pointer-events-none font-mono text-[8px] text-cyan-400/60 z-10">
+            <div className="absolute top-[28px] left-[24px] flex items-center gap-1">
+              <span className="w-1 h-1 bg-cyan-400 rounded-full animate-ping"></span>
+              <span>MALIBU_PT</span>
+            </div>
+            <div className="absolute bottom-[36px] right-[20px] flex items-center gap-1">
+              <span className="w-1 h-1 bg-cyan-400 rounded-full animate-ping"></span>
+              <span>STARK_MAIN</span>
+            </div>
+            <div className="absolute top-[48px] right-[14px] flex flex-col leading-none text-right">
+              <span className="text-[7px] text-zinc-650">AZIMUTH</span>
+              <span className="font-bold text-cyan-500/50">148.91°</span>
+            </div>
+          </div>
 
           {/* Core F.R.I.D.A.Y System Light */}
           <motion.div 
@@ -94,7 +113,7 @@ export default function HudDisplay({ diagnostic }: HudProps) {
           {/* Glowing orbiting satellite bits representing Shards */}
           {diagnostic.shards.map((shard, i) => {
             const angle = (i * 120) * (Math.PI / 180);
-            const r = 58; // orbital radius
+            const r = 62; // orbital radius
             const x = Math.cos(angle) * r;
             const y = Math.sin(angle) * r;
             return (
