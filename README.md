@@ -1,7 +1,3 @@
-<div align="center">
-<img width="1200" height="475" alt="F.R.I.D.A.Y. Admin Core" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
-
 # F.R.I.D.A.Y. Discord Admin Core
 
 **A futuristic, holographic Discord server management dashboard powered by Google Gemini AI**
